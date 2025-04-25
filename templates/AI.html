@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Jarvis Chat</title>
+    <style>
+        body {
+            font-family: sans-serif;
+            background-color: #f0f0f0; /* Light background */
+        }
+        #chat-container {
+            border: 2px solid #4CAF50; /* Green border */
+            height: 300px;
+            overflow-y: scroll;
+            padding: 15px;
+            margin-bottom: 10px;
+            background-color: #ffffff; /* White background for chat area */
+            border-radius: 10px; /* Rounded corners */
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Subtle shadow */
+        }
+        #chat-container p {
+            margin-bottom: 5px;
+        }
+        #chat-container strong {
+            color: #2000fe;
+        }
+        #user-input {
+            width: 80%;
+            padding: 10px;
+            color: #2000fe;
+            border-radius: 5px;
+            margin-right: 10px;
+        }
+        button {
+            padding: 10px 15px;
+            background-color: #4CAF50; /* Green button */
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s ease; /* Smooth transition */
+        }
+        button:hover {
+            color: #2000fe;
+        }
+        h1 {
+            color: #2000fe;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <h1>Chat with Jarvis</h1>
+    <div id="chat-container">
+        <p><strong>Jarvis:</strong> Hello!</p>
+    </div>
+    <div>
+        <input type="text" id="user-input" placeholder="Talk to Jarvis...">
+        <button onclick="sendMessage()">Send</button>
+    </div>
+
+    <script>
+        async function sendMessage() {
+            const userInput = document.getElementById('user-input').value;
+            document.getElementById('chat-container').innerHTML += `<p><strong>You:</strong> ${userInput}</p>`;
+            document.getElementById('user-input').value = '';
+
+            const response = await fetch('/chat', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    messages: [
+                        { role: 'user', content: userInput }
+                    ]
+                }),
+            });
+
+            const data = await response.json();
+            if (data.response) {
+                document.getElementById('chat-container').innerHTML += `<p><strong>Jarvis:</strong> ${data.response}</p>`;
+                document.getElementById('chat-container').scrollTop = document.getElementById('chat-container').scrollHeight;
+            } else if (data.error) {
+                document.getElementById('chat-container').innerHTML += `<p style="color: red;"><strong>Error:</strong> ${data.error}</p>`;
+            }
+        }
+    </script>
+</body>
+</html>
